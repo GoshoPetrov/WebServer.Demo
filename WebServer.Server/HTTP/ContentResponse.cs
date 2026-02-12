@@ -18,5 +18,13 @@ namespace WebServer.Server.HTTP
 
             Headers.Add(Header.ContentType, contentType);
         }
+
+        public override string ToString()
+        {
+            var contentLenght = Encoding.UTF8.GetByteCount(Body);
+            this.Headers.Add(Header.ContentLenght, contentLenght.ToString());
+
+            return base.ToString();
+        }
     }
 }

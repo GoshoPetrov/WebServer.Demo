@@ -4,6 +4,9 @@ using System.IO.Pipes;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using WebServer.Server.Contracts;
+using WebServer.Server.HTTP;
+using WebServer.Server.HTTP_Request;
 
 namespace WebServer.Server
 {
@@ -13,13 +16,28 @@ namespace WebServer.Server
         private readonly int port;
         private readonly TcpListener serverListener;
 
-        public HttpServer(string ipAddress, int port)
+        private readonly RoutingTable routes;
+
+        public HttpServer(string ipAddress, int port, Action<IRountingTable> routingTableConfiguration)
         {
 
             this.ipAddress = IPAddress.Parse(ipAddress);
             this.port = port;
             this.serverListener = new TcpListener(this.ipAddress, port);
 
+            routingTableConfiguration(routes = new RoutingTable());
+        }
+
+        public HttpServer(int port, Action<IRountingTable> config)
+            :this("127.0.0.1", port, config)
+        {
+            
+        }
+
+        public HttpServer(Action<IRountingTable> config)
+            :this(8080, config)
+        {
+            
         }
         public void Start()
         {
@@ -33,24 +51,19 @@ namespace WebServer.Server
                 var networkStream = connection.GetStream();
                 var requestText = this.ReadRequest(networkStream);
                 Console.WriteLine(requestText);
+
+                var request = Request.Parse(requestText);
+                var response = routes.MatchRequest(request);
                 
             }
         }
-//        private void WriteResponse(NetworkStream networkStream, string message)
-//        {
+        private void WriteResponse(NetworkStream networkStream, Response response)
+        {
 
-//            var contentLength = Encoding.UTF8.GetByteCount(message);
+            var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
+            networkStream.Write(responseBytes);
+        }
 
-//            var response = $@"HTTP/1.1 200 OK
-//Content-Type: text/plain; charset=UTF-8
-//Content-Length: {contentLength}
-
-//{message}";
-
-//            var resposeBytes = Encoding.UTF8.GetBytes(response);
-
-//            networkStream.Write(resposeBytes);
-//        }
 
         private string ReadRequest(NetworkStream networkStream)
         {

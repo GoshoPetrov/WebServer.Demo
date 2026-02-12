@@ -24,5 +24,10 @@ namespace WebServer.Server.HTTP_Request
 
         public string Name { get; init; }
         public string Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}: {Value}";
+        }
     }
 }

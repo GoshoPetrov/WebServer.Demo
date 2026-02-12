@@ -7,7 +7,7 @@ using WebServer.Server.HTTP_Request;
 
 namespace WebServer.Server.Contracts
 {
-    internal interface IRountingTable
+    public interface IRountingTable
     {
         IRountingTable Map(string url, Method method, Response response);
         IRountingTable MapGet(string url, Response response);

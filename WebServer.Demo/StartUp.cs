@@ -1,4 +1,6 @@
-﻿using WebServer.Server;
+﻿using System.Security.Cryptography.X509Certificates;
+using WebServer.Server;
+using WebServer.Server.Responses;
 
 namespace WebServer.demo
 {
@@ -6,8 +8,21 @@ namespace WebServer.demo
     {
         static void Main(string[] args)
         {
-            var server = new HttpServer("127.0.0.1", 8080);
+            var server = new HttpServer(x =>
+            {
+                x.MapGet("/html", new HtmlResponse("<h1 style=\"color:blue;\">Hello form my html response</h1>"));
+            });
             server.Start();
+
+
+
+            //Action<string> print = (string input) => 
+            //{
+            //    Console.WriteLine(input);
+            //};
+
+            //print("Hello");
+            
             
         }
     }

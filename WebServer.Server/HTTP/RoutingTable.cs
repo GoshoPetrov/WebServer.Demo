@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebServer.Server.Common;
 using WebServer.Server.Contracts;
 using WebServer.Server.HTTP_Request;
+using WebServer.Server.Responses;
 
 namespace WebServer.Server.HTTP
 {
@@ -24,22 +26,49 @@ namespace WebServer.Server.HTTP
         }
         public IRountingTable Map(string url, Method method, Response response)
         {
-            throw new NotImplementedException();
+            switch (method)
+            {
+                case Method.Get:
+                    return MapGet(url, response);
+                case Method.Post:
+                    return MapPost(url, response);
+                default:
+                    throw new InvalidOperationException($"Method {method} is not suporrted");
+            }
         }
 
         public IRountingTable MapGet(string url, Response response)
         {
-            throw new NotImplementedException();
+            Guard.AgainstNull(url, nameof(url));
+            Guard.AgainstNull(response, nameof(response));
+
+            this.routes[Method.Get][url] = response;
+
+            return this;
         }
 
         public IRountingTable MapPost(string url, Response response)
         {
-            throw new NotImplementedException();
+            Guard.AgainstNull(url, nameof(url));
+            Guard.AgainstNull(response, nameof(response));
+
+            this.routes[Method.Post][url] = response;
+
+            return this;
         }
 
         public Response MatchRequest(Request request)
         {
             var requestMethod = request.Method;
+            var requestUrl = request.Url;
+
+            if(routes.ContainsKey(requestMethod) == false 
+                || routes[requestMethod].ContainsKey(requestUrl) == false)
+            {
+                return new NotFoundResponse();
+            }
+
+            return routes[requestMethod][requestUrl];
         }
     }
 }

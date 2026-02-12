@@ -20,5 +20,23 @@ namespace WebServer.Server.HTTP_Request
             Headers.Add(Header.Server, "MyWebServer");
             Headers.Add(Header.Date, $"{DateTime.UtcNow : r}");
         }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder();
+
+            result.AppendLine($"HTTP/1.1 {(int)StatusCode} {StatusCode}");
+            foreach(var hether in Headers)
+            {
+                result.AppendLine(hether.ToString());
+            }
+            result.AppendLine();
+
+            if (string.IsNullOrWhiteSpace(Body) == false)
+            {
+                result.Append(Body);
+            }
+            return result.ToString();
+        }
     }
 }

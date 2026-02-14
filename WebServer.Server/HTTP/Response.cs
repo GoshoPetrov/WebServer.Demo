@@ -14,11 +14,11 @@ namespace WebServer.Server.HTTP_Request
         {
             this.StatusCode = statusCode;
 
-            this.Headers.Add("Server", "My Web Server");
-            this.Headers.Add("Data", $"{DateTime.UtcNow:r}");
+            //this.Headers.Add("Server", "My Web Server");
+            //this.Headers.Add("Date", $"{DateTime.UtcNow:r}");
 
             Headers.Add(Header.Server, "MyWebServer");
-            Headers.Add(Header.Date, $"{DateTime.UtcNow : r}");
+            Headers.Add(Header.Date, $"{DateTime.UtcNow:r}");
         }
 
         public override string ToString()
@@ -30,13 +30,14 @@ namespace WebServer.Server.HTTP_Request
             {
                 result.AppendLine(hether.ToString());
             }
-            result.AppendLine();
 
-            if (string.IsNullOrWhiteSpace(Body) == false)
+			result.Append(Environment.NewLine);
+
+			if (string.IsNullOrWhiteSpace(Body) == false)
             {
                 result.Append(Body);
-            }
-            return result.ToString();
+			}
+			return result.ToString();
         }
     }
 }

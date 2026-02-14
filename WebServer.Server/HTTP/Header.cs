@@ -8,7 +8,7 @@ namespace WebServer.Server.HTTP_Request
     public class Header
     {
         public const string ContentType = "Content-Type";
-        public const string ContentLenght = "Content-Length";
+        public const string ContentLength = "Content-Length";
         public const string Location = "Location";
         public const string Date = "Date";
         public const string Server = "Server";

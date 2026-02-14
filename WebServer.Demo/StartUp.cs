@@ -8,6 +8,10 @@ namespace WebServer.demo
     {
         static void Main(string[] args)
         {
+            //var xx = new HtmlResponse("<html><h1 style=\"color:blue;\">Hello form my html response</h1></html>");
+            //Console.WriteLine(xx.ToString());
+
+
             var server = new HttpServer(x =>
             {
                 x.MapGet("/html", new HtmlResponse("<h1 style=\"color:blue;\">Hello form my html response</h1>"));
@@ -22,8 +26,8 @@ namespace WebServer.demo
             //};
 
             //print("Hello");
-            
-            
+
+
         }
     }
 }

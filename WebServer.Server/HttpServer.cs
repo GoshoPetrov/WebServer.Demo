@@ -54,8 +54,9 @@ namespace WebServer.Server
 
                 var request = Request.Parse(requestText);
                 var response = routes.MatchRequest(request);
-                
-            }
+                WriteResponse(networkStream, response);
+
+			}
         }
         private void WriteResponse(NetworkStream networkStream, Response response)
         {

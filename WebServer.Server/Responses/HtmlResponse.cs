@@ -11,7 +11,6 @@ namespace WebServer.Server.Responses
     {
         public HtmlResponse(string html) : base(html, ContentType.Html)
         {
-
         }
     }
 }

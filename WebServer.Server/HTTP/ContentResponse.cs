@@ -17,14 +17,17 @@ namespace WebServer.Server.HTTP
             Guard.AgainstNull(contentType);
 
             Headers.Add(Header.ContentType, contentType);
-        }
 
-        public override string ToString()
+			this.Body = content;
+
+			byte[] bodyBytes = Encoding.UTF8.GetBytes(this.Body);
+
+            this.Headers.Add(Header.ContentLength, bodyBytes.Length.ToString());
+		}
+
+		public override string ToString()
         {
-            var contentLenght = Encoding.UTF8.GetByteCount(Body);
-            this.Headers.Add(Header.ContentLenght, contentLenght.ToString());
-
-            return base.ToString();
+			return base.ToString();
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using WebServer.Server;
+using WebServer.Server.HTTP_Request;
 using WebServer.Server.Responses;
+using WebServer.Server.View;
 
 namespace WebServer.demo
 {
@@ -14,7 +16,13 @@ namespace WebServer.demo
 
             var server = new HttpServer(x =>
             {
-                x.MapGet("/html", new HtmlResponse("<h1 style=\"color:blue;\">Hello form my html response</h1>"));
+                x.MapGet("/html", (r) => new HtmlResponse("<h1 style=\"color:blue;\">Hello from my html response</h1>"));
+                x.MapGet("/form", (r) => new HtmlResponse(Form.Html.Replace("{0}", "")));
+                x.MapPost("/form", (r) =>
+                {
+                    var x = r.Body;
+                    return new HtmlResponse(Form.Html.Replace("{0}", $"<h1>You have submitted: {x}</h1>"));
+                });
             });
             server.Start();
 

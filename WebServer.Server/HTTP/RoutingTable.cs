@@ -12,19 +12,19 @@ namespace WebServer.Server.HTTP
 {
     internal class RoutingTable : IRountingTable
     {
-        private readonly Dictionary<Method, Dictionary<string, Response>> routes;
+        private readonly Dictionary<Method, Dictionary<string, MyHandler>> routes;
 
         public RoutingTable()
         {
-            routes = new Dictionary<Method, Dictionary<string, Response>>()
+            routes = new Dictionary<Method, Dictionary<string, MyHandler>>()
             {
-                [Method.Get] = new Dictionary<string, Response>(),
-                [Method.Post] = new Dictionary<string, Response>(),
-                [Method.Delete] = new Dictionary<string, Response>(),
-                [Method.Put] = new Dictionary<string, Response>()
+                [Method.Get] = new Dictionary<string, MyHandler>(),
+                [Method.Post] = new Dictionary<string, MyHandler>(),
+                [Method.Delete] = new Dictionary<string, MyHandler>(),
+                [Method.Put] = new Dictionary<string, MyHandler>()
             };
         }
-        public IRountingTable Map(string url, Method method, Response response)
+        public IRountingTable Map(string url, Method method, MyHandler response)
         {
             switch (method)
             {
@@ -37,7 +37,7 @@ namespace WebServer.Server.HTTP
             }
         }
 
-        public IRountingTable MapGet(string url, Response response)
+        public IRountingTable MapGet(string url, MyHandler response)
         {
             Guard.AgainstNull(url, nameof(url));
             Guard.AgainstNull(response, nameof(response));
@@ -47,7 +47,7 @@ namespace WebServer.Server.HTTP
             return this;
         }
 
-        public IRountingTable MapPost(string url, Response response)
+        public IRountingTable MapPost(string url, MyHandler response)
         {
             Guard.AgainstNull(url, nameof(url));
             Guard.AgainstNull(response, nameof(response));
@@ -57,7 +57,7 @@ namespace WebServer.Server.HTTP
             return this;
         }
 
-        public Response MatchRequest(Request request)
+        public MyHandler MatchRequest(Request request)
         {
             var requestMethod = request.Method;
             var requestUrl = request.Url;
@@ -65,7 +65,7 @@ namespace WebServer.Server.HTTP
             if(routes.ContainsKey(requestMethod) == false 
                 || routes[requestMethod].ContainsKey(requestUrl) == false)
             {
-                return new NotFoundResponse();
+                return (r) => new NotFoundResponse();
             }
 
             return routes[requestMethod][requestUrl];

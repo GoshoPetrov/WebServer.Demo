@@ -7,10 +7,13 @@ using WebServer.Server.HTTP_Request;
 
 namespace WebServer.Server.Contracts
 {
+    public delegate Response MyHandler(Request request);
+
+
     public interface IRountingTable
     {
-        IRountingTable Map(string url, Method method, Response response);
-        IRountingTable MapGet(string url, Response response);
-        IRountingTable MapPost(string url, Response response);
+        IRountingTable Map(string url, Method method, MyHandler response);
+        IRountingTable MapGet(string url, MyHandler response);
+        IRountingTable MapPost(string url, MyHandler response);
     }
 }

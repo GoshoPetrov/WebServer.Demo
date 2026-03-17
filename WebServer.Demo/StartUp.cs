@@ -122,6 +122,45 @@ namespace WebServer.demo
 </body>
 </html>";
                 }));
+
+                x.MapGet("/userprofile", (request) => new DynamicResponse((response) =>
+                {
+                    var cookies = request.Cookies();
+
+                    if (!cookies.ContainsKey("session"))
+                    {
+                        //TODO: or redirect to GET /login ?
+                        response.Body = @"Error! No cookies. Go to <a href=""/login"">Login</a>!";
+                        response.StatusCode = StatusCode.Unauthorized;
+                        return;
+                    }
+
+                    var session = cookies["session"];
+                    if (!serverState.ContainsKey(session))
+                    {
+                        response.Body = @"<!DOCTYPE html>
+<html>
+<head>
+  <title>User profile</title>
+</head>
+<body>
+    Error! No cookies. Go to <a href=""/login"">Login</a>!
+</body>
+</html>
+";
+                        return;
+                    }
+
+                    response.Body = @$"<!DOCTYPE html>
+<html>
+<head>
+  <title>User profile</title>
+</head>
+<body>
+    <h1>Profile for user {serverState[session]}</h1>
+</body>
+</html>";
+                }));
             });
 
 

@@ -66,5 +66,45 @@ namespace WebServer.Server.HTTP_Request
             }
             return headers;
         }
+
+        public Dictionary<string, string> Cookies()
+        {
+            var cookieHeader = this.Headers
+                .FirstOrDefault(h => h.Name.Equals("Cookie", StringComparison.OrdinalIgnoreCase));
+
+            if (cookieHeader == null)
+            {
+                return new Dictionary<string, string>() ;
+            }
+
+            var cookies = cookieHeader.Value.Split(';');
+
+            var result = new Dictionary<string, string>();
+
+            foreach (var cookie in cookies)
+            {
+                var parts = cookie.Split('=', 2);
+
+                if (parts.Length == 2)
+                {
+                    var name = parts[0].Trim();
+                    var value = parts[1].Trim();
+
+                    if (result.ContainsKey(name))
+                    {
+                        //TODO: array values...
+                        result[name] = value;
+                    } 
+                    else
+                    {
+                        result.Add(name, value);
+                    }
+                        
+
+                }
+            }
+
+            return result;
+        }
     }
 }

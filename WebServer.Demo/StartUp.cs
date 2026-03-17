@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using WebServer.Server;
 using WebServer.Server.HTTP;
 using WebServer.Server.HTTP_Request;
@@ -28,7 +29,7 @@ namespace WebServer.demo
 
                 x.MapGet("/login", (r) => new DynamicResponse((response) =>
                 {
-                    response.Headers.Add("session", Guid.NewGuid().ToString());
+                    response.Headers.Add("Set-Cookie", @$"session={Guid.NewGuid().ToString()}; Path=/; HttpOnly; Secure; SameSite=Lax");
                     
                     response.Body = @"<!DOCTYPE html>
 <html>
@@ -51,15 +52,20 @@ namespace WebServer.demo
 
                 x.MapPost("/login", (request) => new DynamicResponse((response) =>
                 {
-                    var sessionHeader = request.Headers.FirstOrDefault((h) => h.Name == "session");
-                    if (sessionHeader == null)
+                    var cookies = request.Cookies();
+
+                    if (!cookies.ContainsKey("session"))
                     {
-                        response.Body = "Error! No session";
+                        //TODO: or redirect to GET /login ?
+                        response.Body = @"Error! No cookies. Go to <a href=""/login"">Login</a>!";
                         response.StatusCode = StatusCode.Unauthorized;
                         return;
                     }
 
-                    response.Headers.Add("session", sessionHeader.Value);
+                    var session = cookies["session"];
+
+                    // remeber to add the session every time
+                    response.Headers.Add("Set-Cookie", @$"session={Guid.NewGuid().ToString()}; Path=/; HttpOnly; Secure; SameSite=Lax");
 
                     response.Body = @$"<!DOCTYPE html>
 <html>
@@ -67,7 +73,7 @@ namespace WebServer.demo
   <title>Login</title>
 </head>
 <body>
-   Session: {sessionHeader.Value}
+   Session: {session}
 </body>
 </html>";
                 }));
@@ -75,8 +81,6 @@ namespace WebServer.demo
 
 
             server.Start();
-
-
 
             //Action<string> print = (string input) => 
             //{

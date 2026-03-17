@@ -10,6 +10,8 @@ namespace WebServer.demo
 {
     internal class StartUp
     {
+        static Dictionary<string, string> serverState = new Dictionary<string, string>();
+
         static void Main(string[] args)
         {
             //var xx = new HtmlResponse("<html><h1 style=\"color:blue;\">Hello form my html response</h1></html>");
@@ -65,7 +67,19 @@ namespace WebServer.demo
                     var session = cookies["session"];
 
                     // remeber to add the session every time
-                    response.Headers.Add("Set-Cookie", @$"session={Guid.NewGuid().ToString()}; Path=/; HttpOnly; Secure; SameSite=Lax");
+                    response.Headers.Add("Set-Cookie", @$"session={session}; Path=/; HttpOnly; Secure; SameSite=Lax");
+
+                    var form = request.Form();
+
+                    if (!form.ContainsKey("username"))
+                    {
+                        response.Body = @"Error! username is missing. Go to <a href=""/login"">Login</a>!";
+                        response.StatusCode = StatusCode.BadRequest;
+                        return;
+                    }
+
+
+                    serverState[session] = form["username"];
 
                     response.Body = @$"<!DOCTYPE html>
 <html>
@@ -73,21 +87,45 @@ namespace WebServer.demo
   <title>Login</title>
 </head>
 <body>
-   Session: {session}
+    <h1>Wellcome, {form["username"]}!</h1>
+    Session: {session}
 </body>
 </html>";
                 }));
-        });
+
+                x.MapGet("/logout", (request) => new DynamicResponse((response) =>
+                {
+                    var cookies = request.Cookies();
+
+                    if (!cookies.ContainsKey("session"))
+                    {
+                        //TODO: or redirect to GET /login ?
+                        response.Body = @"Error! No cookies. Go to <a href=""/login"">Login</a>!";
+                        response.StatusCode = StatusCode.Unauthorized;
+                        return;
+                    }
+
+                    var session = cookies["session"];
+
+                    // remove the session cookie
+                    response.Headers.Add("Set-Cookie", @$"session=; Path=/; HttpOnly; Secure; SameSite=Lax");
+
+                    serverState.Remove(session);
+
+                    response.Body = @"<!DOCTYPE html>
+<html>
+<head>
+  <title>Logout</title>
+</head>
+<body>
+    You are logged out!
+</body>
+</html>";
+                }));
+            });
 
 
             server.Start();
-
-            //Action<string> print = (string input) => 
-            //{
-            //    Console.WriteLine(input);
-            //};
-
-            //print("Hello");
 
 
         }

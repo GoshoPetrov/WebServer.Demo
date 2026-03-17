@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Net;
 
 namespace WebServer.Server.HTTP_Request
 {
@@ -102,6 +103,35 @@ namespace WebServer.Server.HTTP_Request
                         
 
                 }
+            }
+
+            return result;
+        }
+
+        public Dictionary<string, string> Form()
+        {
+            var result = new Dictionary<string, string>();
+
+            if (string.IsNullOrWhiteSpace(this.Body))
+            {
+                return result;
+            }
+
+            var pairs = this.Body.Split('&', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var pair in pairs)
+            {
+                var parts = pair.Split('=', 2);
+
+                if (parts.Length != 2)
+                {
+                    continue; // or throw if you want strict parsing
+                }
+
+                var key = WebUtility.UrlDecode(parts[0]);
+                var value = WebUtility.UrlDecode(parts[1]);
+
+                result[key] = value;
             }
 
             return result;

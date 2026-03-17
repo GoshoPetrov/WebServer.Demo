@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using WebServer.Server;
+using WebServer.Server.HTTP;
 using WebServer.Server.HTTP_Request;
 using WebServer.Server.Responses;
 using WebServer.Server.View;
@@ -16,6 +17,7 @@ namespace WebServer.demo
 
             var server = new HttpServer(x =>
             {
+                x.MapGet("/", (r) => new HtmlResponse("<h1 style=\"color:blue;\">Web server is running!</h1>"));
                 x.MapGet("/html", (r) => new HtmlResponse("<h1 style=\"color:blue;\">Hello from my html response</h1>"));
                 x.MapGet("/form", (r) => new HtmlResponse(Form.Html.Replace("{0}", "")));
                 x.MapPost("/form", (r) =>
@@ -23,7 +25,55 @@ namespace WebServer.demo
                     var x = r.Body;
                     return new HtmlResponse(Form.Html.Replace("{0}", $"<h1>You have submitted: {x}</h1>"));
                 });
-            });
+
+                x.MapGet("/login", (r) => new DynamicResponse((response) =>
+                {
+                    response.Headers.Add("session", Guid.NewGuid().ToString());
+                    
+                    response.Body = @"<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <form action=""/login"" method=""post"">
+    <label>Username:</label>
+    <input type=""text"" name=""username"" required>
+    <br>
+    <label>Password:</label>
+    <input type=""password"" name=""password"" required>
+    <br>
+    <button type=""submit"">Submit</button>
+  </form>
+</body>
+</html>";
+                }));
+
+                x.MapPost("/login", (request) => new DynamicResponse((response) =>
+                {
+                    var sessionHeader = request.Headers.FirstOrDefault((h) => h.Name == "session");
+                    if (sessionHeader == null)
+                    {
+                        response.Body = "Error! No session";
+                        response.StatusCode = StatusCode.Unauthorized;
+                        return;
+                    }
+
+                    response.Headers.Add("session", sessionHeader.Value);
+
+                    response.Body = @$"<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+   Session: {sessionHeader.Value}
+</body>
+</html>";
+                }));
+        });
+
+
             server.Start();
 
 

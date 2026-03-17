@@ -7,7 +7,7 @@ namespace WebServer.Server.HTTP_Request
 {
     public class Response
     {
-        public StatusCode StatusCode { get; init; }
+        public StatusCode StatusCode { get; set; }
         public HeaderCollection Headers { get;  } = new HeaderCollection();
         public string Body { get; set; }
         public Response(StatusCode statusCode)
